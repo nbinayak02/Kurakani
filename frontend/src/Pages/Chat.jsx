@@ -13,7 +13,7 @@ const Chat = () => {
 
   useEffect(() => {
     fetchUser();
-  }, [chatListClick]);
+  }, []);
 
   const handleCloseChatList = (isClicked) => {
     setChatListClick(isClicked);
@@ -31,7 +31,7 @@ const Chat = () => {
       },
     };
 
-    const response = await fetch(`${host}/chat/getUser`, requestOptions);
+    const response = await fetch(`${host}/api/kurakani/chat`, requestOptions);
     const r = await response.json();
     if (response.ok) {
       setUser(r.user);
@@ -60,7 +60,7 @@ const Chat = () => {
 
               <div>
                 <p className="w-fit lg:w-full capitalize text-chat-header-text-light dark:text-gray-400  font-semibold text-center">
-                  {user} Username
+                  Namaste, {user}.
                 </p>
 
                 <p

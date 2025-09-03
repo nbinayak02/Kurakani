@@ -2,46 +2,43 @@ import { useEffect, useState } from "react";
 import MessageBubble from "./MessageBubble";
 import { useAuth } from "../Contexts/AuthContext";
 import { useSocket } from "../Contexts/SocketContext";
+import sortMessages from "../Utility/SortMessages";
 
 const ChatBox = (props) => {
   const [typing, setTyping] = useState(false);
-  const [message, setMessage] = useState("");
-  const [receivedMessages, setReceivedMsgs] = useState([]);
+  const [messageToSend, setMessageToSend] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [allMessages, setAllMessages] = useState([]);
+  const [isLoadingMsg, setIsLoadingMsg] = useState(false);
+  const [loadingError, setLoadingError] = useState(null);
   const { token } = useAuth();
-  const host = "http://localhost:5000";
+  const host = import.meta.env.VITE_BASE_URL;
 
   // establish socket connection
-  const { socket } = useSocket();
+  const { socket, isConnected } = useSocket();
+
+  // fetch messsages once connection is successful
+  useEffect(() => {
+    fetchMessage();
+  }, []);
 
   //socket for receiving messages
   useEffect(() => {
-    if (!socket) return;
-
-    console.log("IS already connected ", socket.connected);
-    console.log("Socket is: ", socket);
-
-    // fetch messsages once connection is successful
-    fetchMessage();
-
-    // receive all messages - once the component is mounted
-    socket.on("messages", (msgs) => {
-      msgs.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date().getTime(a.createdAt)
-      );
-      setReceivedMsgs(msgs);
-    });
-
+    if (!isConnected) return;
     //receive recent message - append recent at last
     socket.on("recentMessage", (msgs) => {
-      setReceivedMsgs((existingMsgs) => [...existingMsgs, msgs]);
+      setAllMessages((existingMsgs) => {
+        const updated = [...existingMsgs, msgs.createdMsg];
+        console.log(updated);
+        return updated;
+      });
     });
 
     //receive typing state
     socket.on("typing", (state) => {
       state === true ? appendTyping() : removeTyping();
     });
-  }, [socket]);
+  }, [socket, isConnected]);
 
   const appendTyping = () => {
     const childNode = document.createElement("p");
@@ -79,14 +76,16 @@ const ChatBox = (props) => {
     }
   }, [typing, socket]);
 
-  useEffect(() => scrollToBottom(), [receivedMessages, typing]);
+  useEffect(() => scrollToBottom(), [allMessages, typing]);
 
   const scrollToBottom = () => {
     const div = document.getElementById("chat-box");
     div.scrollTop = div.scrollHeight;
   };
 
+  //fetch previous messages
   const fetchMessage = async () => {
+    setIsLoadingMsg(true);
     const requestOptions = {
       method: "GET",
       credentials: "include",
@@ -98,28 +97,27 @@ const ChatBox = (props) => {
       },
     };
 
-    await fetch(`${host}/chat/`, requestOptions);
+    const response = await fetch(`${host}/api/kurakani/chat`, requestOptions);
+    const r = await response.json();
+
+    if (response.ok) {
+      const sortedMessage = sortMessages(r.data);
+      setAllMessages(sortedMessage);
+      setIsLoadingMsg(false);
+    } else {
+      setLoadingError(data.message);
+      setIsLoadingMsg(false);
+    }
   };
 
+  //send message
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    const requestOptions = {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Credentials": "true",
-        authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        message: `${message}`,
-      }),
-    };
-
-    await fetch(`${host}/chat/`, requestOptions);
+    setIsSending(true);
+    socket.emit("sendMessage", messageToSend);
+    setIsSending(false);
   };
+
   return (
     <div className="border-2 border-t-0 border-chat-header-border-light dark:border-chat-header-border-dark rounded-t-xl">
       {/* top bar  */}
@@ -150,8 +148,8 @@ const ChatBox = (props) => {
             </div>
           </div>
         </div>
-        {receivedMessages &&
-          receivedMessages.map((m, i) => {
+        {allMessages &&
+          allMessages.map((m, i) => {
             return (
               <div
                 key={i}
@@ -179,7 +177,7 @@ const ChatBox = (props) => {
         >
           <textarea
             placeholder="Your message here"
-            value={message}
+            value={messageToSend}
             className="flex-1 resize-none rounded-xl border 
            border-message-box-border-light dark:border-gray-700
            bg-white dark:bg-slate-800 
@@ -191,13 +189,14 @@ const ChatBox = (props) => {
            shadow-sm"
             onFocus={() => setTyping(true)}
             onBlur={() => setTyping(false)}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => setMessageToSend(e.target.value)}
           />
           <input
             type="submit"
             name="sumbit"
             value="Send"
-            className="w-fit md:w-2/12 bg-greenAccent m-2 py-3 rounded-xl hover:bg-greenAccentHoverLight dark:hover:bg-greenAccentHover transition-colors text-xm font-medium shadow-sm cursor-pointer disabled:cursor-not-allowed"
+            className="w-fit md:w-2/12 bg-greenAccent m-2 py-3 rounded-xl hover:bg-greenAccentHoverLight dark:hover:bg-greenAccentHover transition-colors text-xm font-medium shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-500"
+            disabled={isSending}
           />
         </form>
       </div>

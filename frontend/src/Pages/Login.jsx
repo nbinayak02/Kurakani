@@ -45,7 +45,7 @@ const Login = () => {
       }),
     };
 
-    const response = await fetch(`${host}/chat/user/login`, requestOptions);
+    const response = await fetch(`${host}/api/kurakani/user/login`, requestOptions);
     const r = await response.json();
 
     if (response.status === 200) {
