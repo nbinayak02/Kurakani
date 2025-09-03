@@ -24,7 +24,7 @@ export const SocketProvider = ({ children }) => {
       //first remove all listeners
       socketInstance.off("connect");
       socketInstance.off("disconnect");
-      skt.disconnect();
+      socketInstance.disconnect();
     };
   }, [host]);
 
