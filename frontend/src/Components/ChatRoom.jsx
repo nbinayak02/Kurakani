@@ -12,11 +12,11 @@ const ChatRoom = (props) => {
           Default Chat
         </p>
         <p
-          className={`truncate text-xs font-bold text-chat-list-subtitle-light dark:text-chat-list-subtitle-dark overflow-ellipsis ${
+          className={`text-xs font-bold text-chat-list-subtitle-light dark:text-chat-list-subtitle-dark overflow-ellipsis ${
             props.isClicked ? `font-normal` : ``
           }`}
         >
-          ChatBot: Welcome to chat group.
+          Currently supported group for all connected users.
         </p>
       </div>
     </div>

@@ -1,4 +1,14 @@
+import { useEffect } from "react";
+import getDuration from "../Utility/Date";
+import { useState } from "react";
+
 const MessageBubble = (props) => {
+  const [duration, setDuration] = useState("");
+
+  useEffect(() => {
+    setDuration(getDuration(props.timestamp));
+  }, [props])
+
   return (
     <div className="m-4 ">
       <div className="flex flex-row items-center">

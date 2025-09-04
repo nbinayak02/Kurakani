@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-
 const Signup = () => {
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
@@ -43,7 +42,10 @@ const Signup = () => {
       }),
     };
 
-    const response = await fetch(`${host}/chat/user/signup`, requestOptions);
+    const response = await fetch(
+      `${host}/api/kurakani/user/signup`,
+      requestOptions
+    );
     const r = await response.json();
 
     if (response.status === 201) {
@@ -55,12 +57,11 @@ const Signup = () => {
     }
   };
 
-   return (
+  return (
     <div className="h-screen flex flex-row justify-center items-center">
       <div className="w-[400px] h-fit bg-cardBgLight dark:bg-cardBgDark rounded-2xl p-6 border border-chat-header-border-light dark:border-chat-header-border-dark shadow-lg shadow-shadow-light dark:shadow-shadow-dark">
         <p className="text-chat-header-text-light dark:text-chat-header-text-dark text-2xl font-bold border-l-4 border-greenAccent px-3">
           Signup to Kurakani
-          
         </p>
 
         {error && (
@@ -111,7 +112,6 @@ const Signup = () => {
               <p className="mt-2 text-sm text-red-400">{pasError}</p>
             )}
           </div>
-
 
           {/* submit  */}
 
