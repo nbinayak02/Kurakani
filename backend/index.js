@@ -29,7 +29,7 @@ mongoose
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://kurakani-chat.vercel.app"],
   },
 });
 
@@ -46,7 +46,7 @@ io.on("connection", async (socket) => {
   //broadcast to all clients
   io.to("defaultGroup").emit("onlineUsersCount", socket.currentlyActive);
 
-  socket.on("disconnect",async () => {
+  socket.on("disconnect", async () => {
     const online = await decreaseActiveNow();
     io.to("defaultGroup").emit("onlineUsersCount", online);
     socket.leave("defaultGroup");
@@ -63,7 +63,7 @@ io.on("connection", async (socket) => {
 });
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "https://kurakani-chat.vercel.app"],
   "Access-Control-Allow-Credential": true,
   credentials: true,
 };
