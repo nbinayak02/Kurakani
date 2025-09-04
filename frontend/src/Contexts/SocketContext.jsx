@@ -36,7 +36,7 @@ export const SocketProvider = ({ children }) => {
     //if token hasn't change and socket already exist then no need to proceed forward
     if (tokenReference.current === token && socket.current) return;
 
-    const socketInstance = io(host, { auth: { token } });
+    const socketInstance = io(host, { auth: { token }, withCredentials: true });
     socketInstance.on("connect", () => setIsConnected(true));
     socketInstance.on("disconnect", () => setIsConnected(false));
 
