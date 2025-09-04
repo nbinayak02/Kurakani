@@ -46,6 +46,7 @@ export const SocketProvider = ({ children }) => {
     //disconnect before exiting
     return () => {
       //first remove all listeners
+      socketInstance.emit("disconnectMe");
       socketInstance.off("connect");
       socketInstance.off("disconnect");
       socketInstance.disconnect();

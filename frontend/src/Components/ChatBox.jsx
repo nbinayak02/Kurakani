@@ -5,6 +5,7 @@ import { useSocket } from "../Contexts/SocketContext";
 import sortMessages from "../Utility/SortMessages";
 
 const ChatBox = (props) => {
+  const [onlineCount, setOnlineCount] = useState(0);
   const [typing, setTyping] = useState(false);
   const [messageToSend, setMessageToSend] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -27,17 +28,24 @@ const ChatBox = (props) => {
     if (!isConnected) return;
     //receive recent message - append recent at last
     socket.on("recentMessage", (msgs) => {
-      setAllMessages((existingMsgs) => {
-        const updated = [...existingMsgs, msgs.createdMsg];
-        console.log(updated);
-        return updated;
-      });
+      setAllMessages((existingMsgs) => [...existingMsgs, msgs.createdMsg]);
     });
 
     //receive typing state
-    socket.on("typing", (state) => {
-      state === true ? appendTyping() : removeTyping();
+    socket.on("typing", (typingInfo) => {
+      typingInfo.state === true ? appendTyping() : removeTyping();
     });
+
+    //receive connected user counts
+    socket.on("onlineUsersCount", (count) => {
+      setOnlineCount(count);
+    });
+
+    return () => {
+      socket.off("recentMessage");
+      socket.off("typing");
+      socket.off("onlineUsersCount");
+    }
   }, [socket, isConnected]);
 
   const appendTyping = () => {
@@ -144,7 +152,7 @@ const ChatBox = (props) => {
             </p>
             <div className="text-offline-status text-xs">
               <div className="w-2 h-2 bg-online-status rounded-full inline-block"></div>{" "}
-              4 Active Now
+              {onlineCount} Active Now
             </div>
           </div>
         </div>

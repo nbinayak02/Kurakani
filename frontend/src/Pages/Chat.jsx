@@ -31,7 +31,7 @@ const Chat = () => {
       },
     };
 
-    const response = await fetch(`${host}/api/kurakani/chat`, requestOptions);
+    const response = await fetch(`${host}/api/kurakani/chat/user`, requestOptions);
     const r = await response.json();
     if (response.ok) {
       setUser(r.user);

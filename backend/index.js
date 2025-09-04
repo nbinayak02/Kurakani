@@ -19,7 +19,7 @@ const {
 } = require("./middlewares/Authentication");
 const mongoose = require("mongoose");
 const { saveMessage } = require("./services/Message");
-
+const { setCurrentlyActive, decreaseActiveNow } = require("./controllers/Chat");
 const mongodbUrl = process.env.MONGODB_URL;
 
 mongoose
@@ -34,20 +34,31 @@ const io = new Server(httpServer, {
 });
 
 io.use(authenticateSocket);
+io.use(setCurrentlyActive);
 
 app.set("io", io);
 
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   //join to the default chat group
-  socket.join("defaultGroup");
+
+  await socket.join("defaultGroup");
+
+  //broadcast to all clients
+  io.to("defaultGroup").emit("onlineUsersCount", socket.currentlyActive);
+
+  socket.on("disconnect",async () => {
+    const online = await decreaseActiveNow();
+    io.to("defaultGroup").emit("onlineUsersCount", online);
+    socket.leave("defaultGroup");
+  });
 
   socket.on("sendMessage", async (message) => {
     const savedMessage = await saveMessage(socket.user, message);
-    io.emit("recentMessage", savedMessage);
+    io.to("defaultGroup").emit("recentMessage", savedMessage);
   });
 
   socket.on("typing", (state) => {
-    io.emit("typing", { state: state, by: socket.user });
+    io.to("defaultGroup").emit("typing", { state: state, by: socket.user });
   });
 });
 
@@ -65,3 +76,8 @@ app.use("/api/kurakani/user", userRouter);
 app.use("/api/kurakani/chat", verifyToken, chatRouter);
 
 httpServer.listen(port, () => console.log(`Server started in port ${port}`));
+
+function getOnlineUsers() {
+  const online = io.sockets.adapter.rooms.get("defaultGroup")?.size || 0;
+  return online;
+}
