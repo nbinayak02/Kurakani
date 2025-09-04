@@ -201,7 +201,7 @@ const ChatBox = (props) => {
           />
           <button
             type="submit"
-            className="w-fit md:w-15 flex justify-center items-center bg-green-600 text-white m-2 py-3 rounded-xl hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-300"
+            className="w-fit md:w-15 flex justify-center items-center bg-green-600 text-white m-2 p-3 rounded-xl hover:bg-green-700 transition-colors shadow-sm cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-300"
             disabled={isSending}
           >
             <svg
