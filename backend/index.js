@@ -30,6 +30,7 @@ mongoose
 const io = new Server(httpServer, {
   cors: {
     origin: ["http://localhost:5173", "https://kurakani-chat.vercel.app"],
+    credentials:true,
   },
 });
 
