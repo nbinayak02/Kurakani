@@ -39,6 +39,6 @@ async function decreaseActiveNow() {
 
 module.exports = {
   getLastMessages,
-  setCurrentlyActive,
-  decreaseActiveNow,
+  // setCurrentlyActive,
+  // decreaseActiveNow,
 };
