@@ -1,7 +1,7 @@
 import express from "express";
-import { loginValidator, signupValidator } from "../middlewares/validation.js";
-import { login, signup } from "./auth.controller.js";
-import asyncErrorHandler from "../utils/asyncErrorHandler.js";
+import { loginValidator, signupValidator } from "../../middlewares/validation.js";
+import { login, signup } from "./user.controller.js";
+import asyncErrorHandler from "../../utils/asyncErrorHandler.js";
 
 const router = express.Router();
 

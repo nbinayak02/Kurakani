@@ -1,16 +1,15 @@
 import type { Socket } from "socket.io";
-import ActiveNow from "../chat/activenow.model.js";
+import ActiveNow from "../modules/chat/activenow.model.js";
 
-async function incrementActiveUsers(socket: Socket, next: () => void) {
+async function incrementActiveUsers() {
   const activeLog = await ActiveNow.find({ room: "default" });
   const updatedValue = await ActiveNow.findOneAndUpdate(
     { _id: activeLog[0]?._id },
     { $inc: { currentlyActive: 1 } },
-    { upsert: true, new: true },
+    { upsert: true, returnDocument: "after" },
   );
 
-  socket.data.currentlyActive = updatedValue?.currentlyActive;
-  next();
+  return updatedValue.currentlyActive
 }
 
 async function decrementActiveUsers() {
@@ -18,7 +17,7 @@ async function decrementActiveUsers() {
   const updatedValue = await ActiveNow.findOneAndUpdate(
     { _id: activeLog[0]?._id },
     { $inc: { currentlyActive: -1 } },
-    { new: true },
+    { returnDocument: "after" },
   );
   return updatedValue?.currentlyActive;
 }

@@ -1,16 +1,15 @@
-dotenv.config();
 import cors from "cors";
 import http from "http";
 import dotenv from "dotenv";
 import express from "express";
-import authRouter from "./auth/auth.route.js";
+import authRouter from "./modules/user/user.route.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import { Server } from "socket.io";
 import authenticateSocket from "./middlewares/authentication.js";
-import { incrementActiveUsers } from "./middlewares/activeUsers.js";
 
 const app = express();
 const server = http.createServer(app);
+dotenv.config();
 
 // express cors 
 app.use(
@@ -29,10 +28,9 @@ const io = new Server(server, {
 
 // socket middlewares
 io.use(authenticateSocket)
-io.use(incrementActiveUsers)
 
 // express middlewares
-app.set("io", io);
+// app.set("io", io);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
