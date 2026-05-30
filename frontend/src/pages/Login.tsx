@@ -13,7 +13,7 @@ const Login = () => {
     useEffect(() => {
         if (isSuccess && data) {
             console.log("Response data:", data);
-            login(data.token);
+            login(data);
             navigate("/");
         }
     }, [isSuccess, data, navigate, login]);

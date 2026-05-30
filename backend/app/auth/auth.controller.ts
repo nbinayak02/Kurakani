@@ -7,6 +7,8 @@ import User, { type TUser } from "./auth.model.js";
 import { comparePassword, hashPassword } from "../utils/encrypt.js";
 import type { ApiResponse } from "../types/types.js";
 import { getAccessToken } from "../utils/jwt.js";
+import type { Types } from "mongoose";
+
 
 async function signup(
   req: Request,
@@ -46,9 +48,15 @@ async function signup(
   }
 }
 
+type LoginReturn = {
+  token: string,
+  id: Types.ObjectId,
+  username: string
+}
+
 async function login(
   req: Request,
-  res: Response<ApiResponse<{ token: string }>>,
+  res: Response<ApiResponse<LoginReturn>>,
 ) {
   // try {
     const { email, password } = req.body;
@@ -78,6 +86,8 @@ async function login(
       success: true,
       data: {
         token,
+        id: user._id,
+        username: user.username,
       },
     });
   // } catch (error) {
