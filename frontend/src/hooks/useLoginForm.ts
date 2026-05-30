@@ -3,11 +3,17 @@ import type { LoginError } from "../types/auth";
 import validateLoginForm from "../utils/validateLoginForm";
 import usePost from "./usePost";
 
+type Data = {
+  token: string;
+  username: string;
+  id: string;
+};
+
 const useLoginForm = () => {
   const [errors, setErrors] = useState<LoginError>({});
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [data, setData] = useState<Record<string, string> | null>(null);
+  const [data, setData] = useState<Data | null>(null);
   const { postData } = usePost();
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -38,7 +44,7 @@ const useLoginForm = () => {
     }
     setPending(false);
     setSuccess(response.success);
-    setData(response?.data as Record<string, string>);
+    setData(response?.data as Data);
     return true;
   };
 
