@@ -6,6 +6,7 @@ import usePost from "./usePost";
 const useSignupForm = () => {
   const [errors, setErrors] = useState<SignupError>({});
   const [pending, setPending] = useState(false);
+  const [success, setSuccess] = useState(false);
   const { postData } = usePost();
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -24,7 +25,7 @@ const useSignupForm = () => {
       return false;
     }
 
-    const response = await postData("/api/auth/signup", {
+    const response = await postData("/signup", {
       email,
       username,
       password,
@@ -36,10 +37,11 @@ const useSignupForm = () => {
       return false;
     }
     setPending(false);
+    setSuccess(response.success);
     return true;
   };
 
-  return { handleSubmit, errors, isPending: pending };
+  return { handleSubmit, errors, isPending: pending, isSuccess: success };
 };
 
 export default useSignupForm;

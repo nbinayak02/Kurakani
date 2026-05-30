@@ -5,7 +5,8 @@ type PostDataReturn = {
 };
 
 const usePost = () => {
-  const host = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  const host =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/v1";
 
   const postData = async (
     path: string,
@@ -22,12 +23,14 @@ const usePost = () => {
         body: JSON.stringify(data),
       });
 
+      const res = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
+        // console.log("The response is ", res.error.message)
+        return {success: false, error: res.error.message || "Something went wrong" };
       }
 
-      const res = await response.json();
-      return { success: true, data: res };
+      return { success: res.success, data: res?.data };
     } catch (error: unknown) {
       console.log(error);
       return {
