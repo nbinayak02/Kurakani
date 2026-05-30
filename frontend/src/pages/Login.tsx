@@ -1,10 +1,22 @@
 import { Loader2, MessagesSquare } from "lucide-react";
 import useLoginForm from "../hooks/useLoginForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuth } from "../hooks/useAuth";
 
 const Login = () => {
 
-    const { handleSubmit, errors, isPending } = useLoginForm();
+    const { handleSubmit, errors, isPending, isSuccess, data } = useLoginForm();
+    const navigate = useNavigate();
+    const { login } = useAuth();
+
+    useEffect(() => {
+        if (isSuccess && data) {
+            console.log("Response data:", data);
+            login(data.token);
+            navigate("/");
+        }
+    }, [isSuccess, data, navigate, login]);
 
     return <>
         <div className="w-full h-screen flex items-center justify-center">

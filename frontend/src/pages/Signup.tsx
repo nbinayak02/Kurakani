@@ -1,9 +1,18 @@
 import { Loader2, MessagesSquare } from "lucide-react";
 import useSignupForm from "../hooks/useSignupForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const Signup = () => {
-    const { handleSubmit, errors, isPending } = useSignupForm();
+    const navigate = useNavigate();
+    const { handleSubmit, errors, isPending, isSuccess } = useSignupForm();
+
+    useEffect(() => {
+        if (isSuccess) {
+            navigate("/login");
+        }
+    }, [isSuccess, navigate]);
+
     return <>
         <div className="w-full h-screen flex items-center justify-center">
             {/* container  */}

@@ -6,6 +6,8 @@ import usePost from "./usePost";
 const useLoginForm = () => {
   const [errors, setErrors] = useState<LoginError>({});
   const [pending, setPending] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [data, setData] = useState<Record<string, string> | null>(null);
   const { postData } = usePost();
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -24,7 +26,7 @@ const useLoginForm = () => {
     }
 
     // call api
-    const response = await postData("/api/auth/login", {
+    const response = await postData("/login", {
       email,
       password,
     });
@@ -35,11 +37,12 @@ const useLoginForm = () => {
       return false;
     }
     setPending(false);
-
+    setSuccess(response.success);
+    setData(response?.data as Record<string, string>);
     return true;
   };
 
-  return { handleSubmit, errors, isPending: pending };
+  return { handleSubmit, errors, isPending: pending, isSuccess: success, data };
 };
 
 export default useLoginForm;
